@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>중1 영어 6단원 Free Giveaway 글쓰기 챗봇</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .chat-scroll::-webkit-scrollbar { width: 6px; }
+        .chat-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 9999px; }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .animate-pulse-subtle { animation: pulse-subtle 2s infinite; }
+        .mindmap-updated { animation: highlight-pulse 1.2s ease-out; }
+        @keyframes highlight-pulse {
+            0% { background-color: #fef08a; transform: scale(1.02); }
+            100% { background-color: transparent; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header & Step Indicator -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/20 p-2 rounded-xl text-white">
+                    <i class="fa-solid fa-robot text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold leading-tight">나눔이 (Giveaway Writing Assistant)</h1>
+                    <p class="text-xs text-indigo-200">중1 영어 동아(윤) 6단원 Think and Write 글쓰기 도우미</p>
+                </div>
+            </div>
+
+            <!-- Step Progress Tracker -->
+            <div class="flex items-center bg-indigo-700/60 rounded-xl px-3 py-1.5 text-xs font-medium space-x-2">
+                <div id="step1-badge" class="flex items-center space-x-1 text-yellow-300 font-bold">
+                    <span class="w-5 h-5 rounded-full bg-yellow-400 text-indigo-900 flex items-center justify-center font-extrabold text-[10px]">1</span>
+                    <span>1. AI 인터뷰</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-indigo-400 text-[10px]"></i>
+                <div id="step2-badge" class="flex items-center space-x-1 text-indigo-300">
+                    <span class="w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]">2</span>
+                    <span>2. 초고 합치기</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-indigo-400 text-[10px]"></i>
+                <div id="step3-badge" class="flex items-center space-x-1 text-indigo-300">
+                    <span class="w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]">3</span>
+                    <span>3. AI 피드백 & 학습지 19쪽 작성</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-5 h-[calc(100vh-75px)]">
+
+        <!-- Left Column: AI Chatbot Panel (7 cols) -->
+        <section class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
+            <!-- Chat Header -->
+            <div class="p-3.5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-sm font-semibold text-slate-700">AI 질문 인터뷰 대화방</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="reset-btn" onclick="resetChat()" class="text-xs text-slate-500 hover:text-slate-800 bg-white border border-slate-200 px-2.5 py-1 rounded-lg transition hover:bg-slate-100">
+                        <i class="fa-solid fa-rotate-right mr-1"></i>처음부터 다시
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages Log -->
+            <div id="chat-box" class="flex-1 p-4 overflow-y-auto space-y-4 chat-scroll bg-slate-50/50">
+                <!-- Initial Welcome & Mode Selection -->
+                <div class="flex items-start space-x-3" id="initial-welcome">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white border border-indigo-100 rounded-2xl rounded-tl-none p-4 shadow-sm max-w-[90%] text-sm text-slate-700 leading-relaxed">
+                        <p class="font-bold text-indigo-600 mb-1">반가워! 나는 너의 글쓰기 질문 파트너 나눔이야 👋</p>
+                        <p class="mb-3">원하는 글쓰기 트랙을 고르면 나와의 짧은 대화로 나만의 마인드맵을 완성할 수 있어!</p>
+                        
+                        <p class="text-xs font-semibold text-slate-600 mb-2">👇 모드를 선택해 대화를 시작해 볼까?</p>
+                        
+                        <!-- Mode Selection Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                            <button type="button" onclick="selectWritingMode('standard')" class="p-3 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200 rounded-xl text-left transition group cursor-pointer">
+                                <div class="font-bold text-indigo-900 text-xs flex items-center mb-1">
+                                    <span class="text-base mr-1.5">👟</span> 기본 글쓰기 (교과서)
+                                </div>
+                                <p class="text-[11px] text-indigo-700/80 leading-normal">
+                                    교과서 104쪽 순서대로 신발, 가방, 책 등 나눔 물건 설명 글 쓰기
+                                </p>
+                            </button>
+
+                            <button type="button" onclick="selectWritingMode('expanded')" class="p-3 bg-purple-50/80 hover:bg-purple-100 border border-purple-200 rounded-xl text-left transition group cursor-pointer">
+                                <div class="font-bold text-purple-900 text-xs flex items-center mb-1">
+                                    <span class="text-base mr-1.5">✨</span> 확장 글쓰기 (도전!)
+                                </div>
+                                <p class="text-[11px] text-purple-700/80 leading-normal">
+                                    악기/공부 재능, 디지털 선물, 추억의 물건 등 개성 있는 나눔 쓰기
+                                </p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Helper Chips -->
+            <div class="px-4 py-2 bg-slate-50 border-t border-slate-100 flex flex-wrap gap-1.5 text-xs">
+                <span class="text-slate-400 font-medium mr-1 py-1">도움말 힌트:</span>
+                <button type="button" onclick="sendQuickHelp('영어로 뭐라고 하는지 잘 모르겠어요. 영단어 힌트 주세요!')" class="bg-white border border-slate-200 hover:border-indigo-300 text-slate-600 px-2.5 py-1 rounded-full transition hover:bg-indigo-50">
+                    💡 영단어 물어보기
+                </button>
+                <button type="button" onclick="sendQuickHelp('질문이 조금 어려워요. 정답 문장 대신 질문 힌트로 쉽게 설명해 주세요.')" class="bg-white border border-slate-200 hover:border-indigo-300 text-slate-600 px-2.5 py-1 rounded-full transition hover:bg-indigo-50">
+                    💡 쉬운 힌트 받기
+                </button>
+            </div>
+
+            <!-- Input Form -->
+            <form id="chat-form" onsubmit="handleFormSubmit(event)" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+                <input type="text" id="user-input" placeholder="모드를 먼저 선택한 후 답해줘..." class="flex-1 bg-slate-100 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" autocomplete="off" disabled>
+                <button type="submit" id="send-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-3 rounded-xl text-sm transition flex items-center justify-center disabled:opacity-50" disabled>
+                    <i class="fa-solid fa-paper-plane mr-1"></i> 전송
+                </button>
+            </form>
+        </section>
+
+        <!-- Right Column: Dynamic Mindmap Dashboard (5 cols) -->
+        <section class="lg:col-span-5 flex flex-col h-full overflow-hidden">
+            
+            <!-- Dynamic Mindmap Visual Container -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col h-full justify-between">
+                
+                <div>
+                    <!-- Section Title -->
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                        <h2 class="text-sm font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-sitemap text-indigo-500 mr-2"></i> 나눔 생각 마인드맵
+                        </h2>
+                        <span id="mode-badge" class="text-[11px] bg-slate-100 text-slate-500 font-semibold px-2.5 py-1 rounded-full">모드 선택 대기중</span>
+                    </div>
+
+                    <!-- Placeholder before selection -->
+                    <div id="mindmap-placeholder" class="py-12 text-center text-slate-400 space-y-3">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-400 flex items-center justify-center mx-auto text-xl">
+                            <i class="fa-regular fa-lightbulb"></i>
+                        </div>
+                        <p class="text-xs">왼쪽 대화창에서 <br><strong class="text-indigo-600">[기본 글쓰기]</strong> 또는 <strong class="text-purple-600">[확장 글쓰기]</strong>를 선택하면<br>맞춤형 마인드맵이 이곳에 펼쳐집니다.</p>
+                    </div>
+
+                    <!-- Mode A: Standard Mindmap Grid (Hidden initially) -->
+                    <div id="standard-mindmap" class="hidden space-y-2.5 text-xs">
+                        <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-3 rounded-xl flex items-center justify-between shadow-sm">
+                            <span class="font-medium text-indigo-100 text-[11px]">나눔할 물건 (What):</span>
+                            <span id="std-map-what" class="font-bold text-sm bg-white/20 px-3 py-1 rounded-lg">대화로 정하기</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                                <div class="text-slate-500 font-semibold text-[11px] mb-1">
+                                    <i class="fa-solid fa-calendar-days text-emerald-500 mr-1"></i> When & Where
+                                </div>
+                                <div id="std-map-whenwhere" class="text-slate-700 font-medium min-h-[32px] flex items-center">
+                                    -
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                                <div class="text-slate-500 font-semibold text-[11px] mb-1">
+                                    <i class="fa-solid fa-palette text-amber-500 mr-1"></i> Size & Color
+                                </div>
+                                <div id="std-map-sizecolor" class="text-slate-700 font-medium min-h-[32px] flex items-center">
+                                    -
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                                <div class="text-slate-500 font-semibold text-[11px] mb-1">
+                                    <i class="fa-solid fa-circle-question text-rose-500 mr-1"></i> Why give away?
+                                </div>
+                                <div id="std-map-why" class="text-slate-700 font-medium min-h-[32px] flex items-center">
+                                    -
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                                <div class="text-slate-500 font-semibold text-[11px] mb-1">
+                                    <i class="fa-solid fa-lightbulb text-indigo-500 mr-1"></i> Inference (누구에게)
+                                </div>
+                                <div id="std-map-inference" class="text-slate-700 font-medium min-h-[32px] flex items-center">
+                                    -
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode B: Expanded Mindmap Grid (Hidden initially) -->
+                    <div id="expanded-mindmap" class="hidden space-y-2.5 text-xs">
+                        <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-3 rounded-xl flex items-center justify-between shadow-sm">
+                            <span class="font-medium text-purple-100 text-[11px]">나눔할 재능/특별나눔 (What):</span>
+                            <span id="exp-map-what" class="font-bold text-sm bg-white/20 px-3 py-1 rounded-lg">대화로 정하기</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                                <div class="text-slate-500 font-semibold text-[11px] mb-1">
+                                    <i class="fa-solid fa-clock text-purple-500 mr-1"></i> How & Where (방식)
+                                </div>
+                                <div id="exp-map-howwhere" class="text-slate-700 font-medium min-h-[32px] flex items-center">
+                                    -
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                                <div class="text-slate-500 font-semibold text-[11px] mb-1">
+                                    <i class="fa-solid fa-star text-amber-500 mr-1"></i> Special Feature (특징)
+                                </div>
+                                <div id="exp-map-feature" class="text-slate-700 font-medium min-h-[32px] flex items-center">
+                                    -
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                                <div class="text-slate-500 font-semibold text-[11px] mb-1">
+                                    <i class="fa-solid fa-heart text-rose-500 mr-1"></i> Reason (나누는 이유)
+                                </div>
+                                <div id="exp-map-why" class="text-slate-700 font-medium min-h-[32px] flex items-center">
+                                    -
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                                <div class="text-slate-500 font-semibold text-[11px] mb-1">
+                                    <i class="fa-solid fa-comment-dots text-indigo-500 mr-1"></i> Target & Message
+                                </div>
+                                <div id="exp-map-inference" class="text-slate-700 font-medium min-h-[32px] flex items-center">
+                                    -
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grammar & Sentence Structure Scaffolding Box -->
+                <div class="mt-4 bg-amber-50/80 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-900 space-y-2">
+                    <div class="font-bold flex items-center text-amber-800 border-b border-amber-200/60 pb-1.5">
+                        <i class="fa-solid fa-key text-amber-600 mr-1.5"></i> 6단원 핵심 문법 구조 뼈대
+                    </div>
+                    <ul class="space-y-1.5 text-[11px] text-amber-800">
+                        <li class="flex items-start space-x-1.5">
+                            <span class="bg-amber-200/80 text-amber-900 font-bold px-1.5 py-0.5 rounded text-[10px]">to부정사</span>
+                            <span>I want <strong>to give away</strong> my ~ .</span>
+                        </li>
+                        <li class="flex items-start space-x-1.5">
+                            <span class="bg-amber-200/80 text-amber-900 font-bold px-1.5 py-0.5 rounded text-[10px]">that절</span>
+                            <span>I think <strong>that</strong> they / it ~ .</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Step 2 & 3: Draft Combination & Proofread Action Container -->
+                <div id="draft-action-container" class="mt-4 pt-3 border-t border-slate-100">
+                    <!-- Status Badge when interviewing -->
+                    <div id="interview-progress-status" class="bg-slate-100 border border-slate-200 rounded-xl p-3 text-center text-xs text-slate-500">
+                        <i class="fa-solid fa-spinner fa-spin text-indigo-500 mr-1.5"></i>
+                        AI 인터뷰 진행 중... (마인드맵 항목 채우는 중)
+                    </div>
+
+                    <!-- Appears ONLY when interview completes -->
+                    <div id="draft-ready-box" class="hidden space-y-2.5">
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800 flex items-start space-x-2">
+                            <i class="fa-solid fa-circle-check text-emerald-600 text-sm mt-0.5"></i>
+                            <div>
+                                <strong class="font-bold">마인드맵 완성!</strong>
+                                <p class="text-[11px] text-emerald-700 leading-normal mt-0.5">
+                                    이제 대화로 정리한 표현들을 하나의 영문 초고로 합쳐보세요. 아래 버튼을 눌러 AI 점검을 받을 수 있습니다.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button id="proofread-trigger-btn" onclick="openProofreadModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 rounded-xl transition shadow-sm flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-magnifying-glass-chart mr-1.5"></i> 내가 합친 영문 초고 AI 피드백 요청하기
+                        </button>
+                        
+                        <p class="text-[10px] text-center text-slate-400 font-medium">
+                            📝 피드백을 참고하여 완성한 최종본은 **[학습지 19쪽]**에 작성하세요.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Modal for Proofreading Student's Draft -->
+    <div id="proofread-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-5 max-w-lg w-full shadow-xl space-y-3">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center">
+                    <i class="fa-solid fa-pen-nib text-emerald-600 mr-2"></i> 초고를 하나로 합친 글 AI 점검받기
+                </h3>
+                <button onclick="closeProofreadModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-500 leading-normal">
+                각 질문에 답했던 표현들을 모아 하나의 영문 단락으로 합쳐서 아래에 적어보세요.<br>
+                AI 점검을 마친 최종 수정본은 <strong class="text-indigo-600">교과서가 아닌 [학습지 19쪽]</strong>에 적어 완성합니다!
+            </p>
+
+            <textarea id="modal-draft-input" rows="5" placeholder="예시: I want to give away my sneakers. I bought them online last year. They are size 240 and white. I think that my friend Minho needs them." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white resize-none"></textarea>
+
+            <div class="flex gap-2 justify-end pt-1">
+                <button onclick="closeProofreadModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition">취소</button>
+                <button onclick="submitDraftForReview()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition">AI 힌트 검토 받기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal replacing browser alert() -->
+    <div id="alert-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-5 max-w-sm w-full shadow-xl text-center space-y-3">
+            <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto text-lg">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <p id="alert-message" class="text-xs font-semibold text-slate-700 leading-relaxed"></p>
+            <button onclick="closeAlertModal()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition">확인</button>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+        const SYSTEM_INSTRUCTION = `
+You are "나눔이" (Giveaway Bot), a warm, supportive middle school English writing chatbot for Korean 7th-grade students studying Dong-A Yoon Lesson 6 ("Think and Write" - Free Giveaway Announcement, textbook p.104).
+
+CRITICAL PEDAGOGICAL RULES:
+1. NEVER WRITE THE COMPLETE ESSAY OR FULL COMPLETED ENGLISH SENTENCES / SAMPLE ANSWERS FOR THE STUDENT.
+2. DO NOT PROVIDE PRE-WRITTEN SAMPLE SENTENCES OR ANSWER EXAMPLES IN YOUR QUESTIONS OR RESPONSES. Encourage students to generate their own original ideas.
+3. DUAL TRACK INTERVIEWING MODES:
+   - MODE A (기본 글쓰기 - Standard): Focus on physical items (shoes, books, bags). Ask in order: What -> When/Where -> Size/Color -> Why -> Inference.
+   - MODE B (확장 글쓰기 - Expanded): Focus on talents, digital goods, or personal memories. Ask in order: What (talent/item) -> How & Where -> Special Features -> Why -> Inference & Message.
+4. SOCRATIC QUESTIONER: Ask ONE friendly question at a time in Korean to encourage students to think of their own ideas.
+5. DO NOT REPEAT INTRODUCTORY GREETINGS in subsequent responses.
+6. STRICT VOCABULARY HINT RULE:
+   - DO NOT automatically offer English vocabulary translations in regular interviewing turns.
+   - ONLY provide English vocabulary hints WHEN the student explicitly asks for them.
+   - WHEN THE STUDENT ASKS FOR VOCABULARY, DO NOT OUTPUT META-TEXT (e.g., NEVER write "아래 힌트 중에서~", "Level 1:").
+   - Directly state the key English word/expression concisely and warmly (e.g., "보통은 ~라고 표현해!").
+7. INTERVIEW COMPLETION & DRAFT COMBINATION:
+   - When all 5 mindmap elements are collected, warmly announce in Korean that all answers are ready.
+   - Prompt the student: "축하해! 마인드맵 생성이 완료되었어! 이제 대화에서 작성한 문장들을 하나로 모아서 전체 초고로 합쳐볼 시간이야!"
+   - Remind them to submit their combined draft for AI feedback, and then write the final polished version on [학습지 19쪽] (Writing Sheet p.19).
+   - Append tag <INTERVIEW_COMPLETE/> at the end.
+8. RESPONSE FORMAT FOR INTERVIEW MODE:
+   - Acknowledge answer warmly in Korean.
+   - Ask the NEXT question clearly in Korean.
+   - Output mindmap tag at the VERY END in exact XML format:
+     <MINDMAP_UPDATE>
+     key: [what | whenwhere | sizecolor | why | inference | howwhere | feature]
+     value: [short Korean/English keyword summary]
+     </MINDMAP_UPDATE>
+`;
+
+        // Application State Variables
+        let chatHistory = [];
+        let currentMode = null; // 'standard' or 'expanded'
+        let filledCount = 0;
+        let isProcessing = false;
+
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        function showAlertModal(msg) {
+            document.getElementById('alert-message').innerText = msg;
+            document.getElementById('alert-modal').classList.remove('hidden');
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alert-modal').classList.add('hidden');
+        }
+
+        function formatAiResponse(text) {
+            // Replace markdown bold, linebreaks, bullet points
+            let formatted = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-indigo-900">$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+                .replace(/\n\n/g, '</p><p class="mt-2">')
+                .replace(/\n/g, '<br>');
+            return `<p>${formatted}</p>`;
+        }
+
+        function appendUserMessage(text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'flex items-start justify-end space-x-3';
+            msgDiv.innerHTML = `
+                <div class="bg-indigo-600 text-white rounded-2xl rounded-tr-none p-3.5 shadow-sm max-w-[80%] text-sm leading-relaxed">
+                    ${text.replace(/\n/g, '<br>')}
+                </div>
+                <div class="w-9 h-9 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center flex-shrink-0 font-bold text-xs">
+                    나
+                </div>
+            `;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendThinkingIndicator() {
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.id = 'thinking-indicator';
+            indicatorDiv.className = 'flex items-start space-x-3';
+            indicatorDiv.innerHTML = `
+                <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="bg-white border border-indigo-100 rounded-2xl rounded-tl-none p-3.5 shadow-sm text-sm text-slate-400 flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-notch fa-spin text-indigo-500"></i>
+                    <span>생각 중...</span>
+                </div>
+            `;
+            chatBox.appendChild(indicatorDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function removeThinkingIndicator() {
+            const indicator = document.getElementById('thinking-indicator');
+            if (indicator) indicator.remove();
+        }
+
+        async function queryGeminiAPI(userQueryText) {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            appendThinkingIndicator();
+
+            chatHistory.push({
+                role: 'user',
+                parts: [{ text: userQueryText }]
+            });
+
+            const payload = {
+                contents: chatHistory,
+                systemInstruction: {
+                    parts: [{ text: SYSTEM_INSTRUCTION }]
+                }
+            };
+
+            let response = null;
+            let retries = 0;
+            const maxRetries = 3;
+
+            while (retries < maxRetries) {
+                try {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) break;
+                } catch (e) {
+                    console.debug("Retry API call:", retries);
+                }
+                retries++;
+                await new Promise(r => setTimeout(r, Math.pow(2, retries) * 1000));
+            }
+
+            removeThinkingIndicator();
+            isProcessing = false;
+
+            if (!response || !response.ok) {
+                appendAiMessage("미안해, 일시적인 오류가 발생했어. 다시 한 번 말씀해 줄래?");
+                return;
+            }
+
+            const result = await response.json();
+            const candidate = result.candidates?.[0];
+            const aiReplyText = candidate?.content?.parts?.[0]?.text;
+
+            if (aiReplyText) {
+                chatHistory.push({
+                    role: 'model',
+                    parts: [{ text: aiReplyText }]
+                });
+                appendAiMessage(aiReplyText);
+            } else {
+                appendAiMessage("답변을 생성하지 못했어. 다시 시도해 볼까?");
+            }
+        }
+
+        function appendAiMessage(text) {
+            const { cleanText, mindmapData, isComplete } = parseMindmapUpdates(text);
+            
+            if (mindmapData) {
+                updateMindmapUI(mindmapData.key, mindmapData.value);
+            }
+
+            if (isComplete || filledCount >= 5) {
+                unlockDraftCombinationStep();
+            }
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'flex items-start space-x-3';
+            msgDiv.innerHTML = `
+                <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="bg-white border border-indigo-100 rounded-2xl rounded-tl-none p-3.5 shadow-sm max-w-[85%] text-sm text-slate-700 leading-relaxed">
+                    ${formatAiResponse(cleanText)}
+                </div>
+            `;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function parseMindmapUpdates(text) {
+            const regex = /<MINDMAP_UPDATE>[\s\S]*?key:\s*(\w+)[\s\S]*?value:\s*([\s\S]*?)<\/MINDMAP_UPDATE>/i;
+            const match = text.match(regex);
+            const isComplete = text.includes('<INTERVIEW_COMPLETE/>');
+            
+            let mindmapData = null;
+
+            if (match) {
+                mindmapData = {
+                    key: match[1].toLowerCase().trim(),
+                    value: match[2].trim()
+                };
+            }
+
+            let cleanText = text
+                .replace(/<MINDMAP_UPDATE>[\s\S]*?<\/MINDMAP_UPDATE>/gi, '')
+                .replace(/<INTERVIEW_COMPLETE\/>/gi, '')
+                .replace(/key:\s*\w+/gi, '')
+                .replace(/value:\s*.*$/gim, '')
+                .trim();
+
+            return { cleanText, mindmapData, isComplete };
+        }
+
+        function updateMindmapUI(key, value) {
+            const stdKeys = {
+                'what': 'std-map-what',
+                'whenwhere': 'std-map-whenwhere',
+                'sizecolor': 'std-map-sizecolor',
+                'why': 'std-map-why',
+                'inference': 'std-map-inference'
+            };
+
+            const expKeys = {
+                'what': 'exp-map-what',
+                'howwhere': 'exp-map-howwhere',
+                'feature': 'exp-map-feature',
+                'why': 'exp-map-why',
+                'inference': 'exp-map-inference'
+            };
+
+            const activeMap = currentMode === 'standard' ? stdKeys : expKeys;
+
+            if (activeMap[key]) {
+                const el = document.getElementById(activeMap[key]);
+                if (el) {
+                    el.textContent = value;
+                    el.parentElement.classList.add('mindmap-updated');
+                    setTimeout(() => el.parentElement.classList.remove('mindmap-updated'), 1200);
+                    filledCount++;
+                    if (filledCount >= 4) {
+                        unlockDraftCombinationStep();
+                    }
+                }
+            }
+        }
+
+        function unlockDraftCombinationStep() {
+            document.getElementById('interview-progress-status').classList.add('hidden');
+            document.getElementById('draft-ready-box').classList.remove('hidden');
+            
+            // Update Top Progress Badges
+            document.getElementById('step1-badge').className = 'flex items-center space-x-1 text-indigo-300';
+            document.getElementById('step1-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]';
+
+            document.getElementById('step2-badge').className = 'flex items-center space-x-1 text-yellow-300 font-bold';
+            document.getElementById('step2-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-yellow-400 text-indigo-900 flex items-center justify-center font-extrabold text-[10px]';
+        }
+
+        async function selectWritingMode(mode) {
+            currentMode = mode;
+            
+            // Enable Input Form
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            userInput.placeholder = "답변을 적어봐 (한글이나 짧은 단어도 괜찮아!)...";
+            userInput.focus();
+
+            document.getElementById('mindmap-placeholder').classList.add('hidden');
+
+            const modeBadge = document.getElementById('mode-badge');
+
+            if (mode === 'standard') {
+                document.getElementById('standard-mindmap').classList.remove('hidden');
+                document.getElementById('expanded-mindmap').classList.add('hidden');
+                modeBadge.textContent = '👟 기본 글쓰기 (물건)';
+                modeBadge.className = 'text-[11px] bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-full';
+            } else {
+                document.getElementById('standard-mindmap').classList.add('hidden');
+                document.getElementById('expanded-mindmap').classList.remove('hidden');
+                modeBadge.textContent = '✨ 확장 글쓰기 (재능/특별나눔)';
+                modeBadge.className = 'text-[11px] bg-purple-100 text-purple-700 font-semibold px-2.5 py-1 rounded-full';
+            }
+
+            const initialPrompt = mode === 'standard'
+                ? "학생이 [기본 글쓰기 모드(물건)]를 선택했습니다. 친근하게 학생을 맞이하고 첫 번째 질문(나눔하고 싶은 물건 이름 What)을 한 번에 하나만 던져주세요."
+                : "학생이 [확장 글쓰기 모드(재능/특별나눔)]를 선택했습니다. 친근하게 학생을 맞이하고 첫 번째 질문(나눔하고 싶은 재능이나 특별한 선물 What)을 한 번에 하나만 던져주세요.";
+
+            await queryGeminiAPI(initialPrompt);
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const text = userInput.value.trim();
+            if (!text || isProcessing) return;
+
+            userInput.value = '';
+            appendUserMessage(text);
+            await queryGeminiAPI(text);
+        }
+
+        async function sendQuickHelp(helpText) {
+            if (!currentMode) {
+                showAlertModal("먼저 대화방에서 [기본 글쓰기] 또는 [확장 글쓰기] 모드를 선택해 주세요!");
+                return;
+            }
+            appendUserMessage(helpText);
+            await queryGeminiAPI(helpText);
+        }
+
+        function openProofreadModal() {
+            document.getElementById('proofread-modal').classList.remove('hidden');
+        }
+
+        function closeProofreadModal() {
+            document.getElementById('proofread-modal').classList.add('hidden');
+        }
+
+        async function submitDraftForReview() {
+            const inputEl = document.getElementById('modal-draft-input');
+            const draft = inputEl.value.trim();
+            if (!draft) {
+                showAlertModal('하나로 합친 영문 초고를 입력해 주세요!');
+                return;
+            }
+
+            closeProofreadModal();
+
+            // Update Progress Badge to Step 3
+            document.getElementById('step2-badge').className = 'flex items-center space-x-1 text-indigo-300';
+            document.getElementById('step2-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]';
+
+            document.getElementById('step3-badge').className = 'flex items-center space-x-1 text-yellow-300 font-bold';
+            document.getElementById('step3-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-yellow-400 text-indigo-900 flex items-center justify-center font-extrabold text-[10px]';
+
+            const prompt = `
+[학생 영문 통합 초고 피드백 요청]
+아래는 내가 질문 답변들을 모아 하나로 합친 전체 영어 초고야. 
+절대로 정답 문장으로 통째로 고쳐서 써주지 말고, 내가 스스로 고칠 수 있도록 힌트만 줘!
+- 문법 오류 위치 (특히 want to + 동사원형, I think that 절 부분)
+- 철자나 구두점(, .) 오류 힌트
+- 피드백 마지막에 "힌트를 참고해 완성한 최종본은 [학습지 19쪽]에 적어보렴!"이라고 안내해줘.
+
+[내가 합쳐서 쓴 글]
+${draft}
+`;
+
+            appendUserMessage("하나로 합친 영문 초고 점검 요청 📝\n\n" + draft);
+            await queryGeminiAPI(prompt);
+        }
+
+        function resetChat() {
+            chatHistory = [];
+            currentMode = null;
+            filledCount = 0;
+            isProcessing = false;
+
+            document.getElementById('chat-box').innerHTML = `
+                <div class="flex items-start space-x-3" id="initial-welcome">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white border border-indigo-100 rounded-2xl rounded-tl-none p-4 shadow-sm max-w-[90%] text-sm text-slate-700 leading-relaxed">
+                        <p class="font-bold text-indigo-600 mb-1">반가워! 나는 너의 글쓰기 질문 파트너 나눔이야 👋</p>
+                        <p class="mb-3">원하는 글쓰기 트랙을 고르면 나와의 짧은 대화로 나만의 마인드맵을 완성할 수 있어!</p>
+                        <p class="text-xs font-semibold text-slate-600 mb-2">👇 모드를 선택해 대화를 시작해 볼까?</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                            <button type="button" onclick="selectWritingMode('standard')" class="p-3 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200 rounded-xl text-left transition group cursor-pointer">
+                                <div class="font-bold text-indigo-900 text-xs flex items-center mb-1">
+                                    <span class="text-base mr-1.5">👟</span> 기본 글쓰기 (교과서)
+                                </div>
+                                <p class="text-[11px] text-indigo-700/80 leading-normal">
+                                    교과서 104쪽 순서대로 신발, 가방, 책 등 나눔 물건 설명 글 쓰기
+                                </p>
+                            </button>
+                            <button type="button" onclick="selectWritingMode('expanded')" class="p-3 bg-purple-50/80 hover:bg-purple-100 border border-purple-200 rounded-xl text-left transition group cursor-pointer">
+                                <div class="font-bold text-purple-900 text-xs flex items-center mb-1">
+                                    <span class="text-base mr-1.5">✨</span> 확장 글쓰기 (도전!)
+                                </div>
+                                <p class="text-[11px] text-purple-700/80 leading-normal">
+                                    악기/공부 재능, 디지털 선물, 추억의 물건 등 개성 있는 나눔 쓰기
+                                </p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+            userInput.placeholder = "모드를 먼저 선택한 후 답해줘...";
+
+            document.getElementById('mindmap-placeholder').classList.remove('hidden');
+            document.getElementById('standard-mindmap').classList.add('hidden');
+            document.getElementById('expanded-mindmap').classList.add('hidden');
+            
+            document.getElementById('mode-badge').textContent = '모드 선택 대기중';
+            document.getElementById('mode-badge').className = 'text-[11px] bg-slate-100 text-slate-500 font-semibold px-2.5 py-1 rounded-full';
+
+            document.getElementById('interview-progress-status').classList.remove('hidden');
+            document.getElementById('draft-ready-box').classList.add('hidden');
+
+            document.getElementById('step1-badge').className = 'flex items-center space-x-1 text-yellow-300 font-bold';
+            document.getElementById('step1-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-yellow-400 text-indigo-900 flex items-center justify-center font-extrabold text-[10px]';
+            document.getElementById('step2-badge').className = 'flex items-center space-x-1 text-indigo-300';
+            document.getElementById('step2-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]';
+            document.getElementById('step3-badge').className = 'flex items-center space-x-1 text-indigo-300';
+            document.getElementById('step3-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]';
+
+            // Reset mindmap cell values
+            ['std-map-what', 'std-map-whenwhere', 'std-map-sizecolor', 'std-map-why', 'std-map-inference',
+             'exp-map-what', 'exp-map-howwhere', 'exp-map-feature', 'exp-map-why', 'exp-map-inference'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = id.includes('what') ? '대화로 정하기' : '-';
+             });
+        }
+    </script>
+</body>
+</html>
