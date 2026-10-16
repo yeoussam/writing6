@@ -276,7 +276,6 @@ CRITICAL PEDAGOGICAL GUIDELINES:
             if (keyFromUrl) {
                 userApiKey = keyFromUrl.trim();
                 localStorage.setItem('gemini_api_key', userApiKey);
-                // 주소창 깔끔하게 정리 (?k=... 숨김)
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
             updateApiBadge();
@@ -371,11 +370,11 @@ CRITICAL PEDAGOGICAL GUIDELINES:
 
                 const data = await response.json();
 
-                
-if(data.error) {
-    appendBotMessage(`⚠️ 구글 API 오류 [${data.error.code || 'ERR'}]: ${data.error.message}`);
-    return;
-}
+                if(data.error) {
+                    appendBotMessage(`⚠️ 구글 API 오류 [${data.error.code || 'ERR'}]: ${data.error.message}`);
+                    return;
+                }
+
                 const botReply = data.candidates[0].content.parts[0].text;
                 chatHistory.push({ role: "model", parts: [{ text: botReply }] });
 
@@ -390,7 +389,7 @@ if(data.error) {
         }
 
         function parseAndUpdateMindmap(text) {
-            const regex = /\[MINDMAP:(what\vert{}feature\vert{}whenwhere\vert{}why\vert{}who)=([^\]]+)\]/g;
+            const regex = /\[MINDMAP:(what|feature|whenwhere|why|who)=([^\]]+)\]/g;
             let match;
             while ((match = regex.exec(text)) !== null) {
                 const key = match[1];
@@ -444,9 +443,12 @@ if(data.error) {
 
         function openCombineModal() {
             let initialText = "";
-            if(mindmapData.what) initialText += `I want to give away my ${mindmapData.what}.\n`;
-            if(mindmapData.feature) initialText += `It is ${mindmapData.feature}.\n`;
-            if(mindmapData.why) initialText += `I give it away because ${mindmapData.why}.\n`;
+            if(mindmapData.what) initialText += `I want to give away my ${mindmapData.what}.
+`;
+            if(mindmapData.feature) initialText += `It is ${mindmapData.feature}.
+`;
+            if(mindmapData.why) initialText += `I give it away because ${mindmapData.why}.
+`;
             if(mindmapData.who) initialText += `I think that ${mindmapData.who} will like it.`;
 
             const draftInput = document.getElementById('combinedDraftInput');
