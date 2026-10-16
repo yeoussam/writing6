@@ -355,7 +355,7 @@ CRITICAL PEDAGOGICAL GUIDELINES:
 
             chatHistory.push({ role: "user", parts: [{ text: userText }] });
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userApiKey}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
             const payload = {
                 systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
                 contents: chatHistory
@@ -486,11 +486,11 @@ Keep response under 4 lines in friendly Korean.
 `;
 
             try {
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userApiKey}`;
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    body: JSON.stringify(payload)
                 });
 
                 const data = await response.json();
