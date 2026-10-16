@@ -371,11 +371,11 @@ CRITICAL PEDAGOGICAL GUIDELINES:
 
                 const data = await response.json();
 
-                if(data.error) {
-                    appendBotMessage("⚠️ API 키가 올바르지 않거나 구글 서버 오류입니다. API 키를 다시 확인해 주세요.");
-                    return;
-                }
-
+                
+if(data.error) {
+    appendBotMessage(`⚠️ 구글 API 오류 [${data.error.code || 'ERR'}]: ${data.error.message}`);
+    return;
+}
                 const botReply = data.candidates[0].content.parts[0].text;
                 chatHistory.push({ role: "model", parts: [{ text: botReply }] });
 
