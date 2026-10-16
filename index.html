@@ -38,21 +38,36 @@
                 </div>
             </div>
 
-            <!-- Step Progress Tracker -->
-            <div class="flex items-center bg-indigo-700/60 rounded-xl px-3 py-1.5 text-xs font-medium space-x-2">
-                <div id="step1-badge" class="flex items-center space-x-1 text-yellow-300 font-bold">
-                    <span class="w-5 h-5 rounded-full bg-yellow-400 text-indigo-900 flex items-center justify-center font-extrabold text-[10px]">1</span>
-                    <span>1. AI 인터뷰</span>
+            <!-- Header Actions & Step Progress Tracker -->
+            <div class="flex items-center space-x-3">
+                <!-- Firebase Cloud Status Badge -->
+                <div id="cloud-status-badge" class="hidden sm:flex items-center space-x-1 bg-indigo-800/80 text-indigo-200 px-2.5 py-1 rounded-xl text-xs font-medium">
+                    <i class="fa-solid fa-cloud-arrow-up text-emerald-400 text-xs"></i>
+                    <span id="cloud-status-text">클라우드 연결 중...</span>
                 </div>
-                <i class="fa-solid fa-chevron-right text-indigo-400 text-[10px]"></i>
-                <div id="step2-badge" class="flex items-center space-x-1 text-indigo-300">
-                    <span class="w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]">2</span>
-                    <span>2. 초고 합치기</span>
-                </div>
-                <i class="fa-solid fa-chevron-right text-indigo-400 text-[10px]"></i>
-                <div id="step3-badge" class="flex items-center space-x-1 text-indigo-300">
-                    <span class="w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]">3</span>
-                    <span>3. AI 피드백 & 학습지 19쪽 작성</span>
+
+                <!-- API Key Status Button -->
+                <button onclick="openApiKeyModal()" id="api-key-status-btn" class="flex items-center space-x-1.5 bg-emerald-500 hover:bg-emerald-400 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">
+                    <i class="fa-solid fa-key text-xs"></i>
+                    <span id="api-status-text">API 키 연결됨</span>
+                </button>
+
+                <!-- Step Progress Tracker -->
+                <div class="hidden md:flex items-center bg-indigo-700/60 rounded-xl px-3 py-1.5 text-xs font-medium space-x-2">
+                    <div id="step1-badge" class="flex items-center space-x-1 text-yellow-300 font-bold">
+                        <span class="w-5 h-5 rounded-full bg-yellow-400 text-indigo-900 flex items-center justify-center font-extrabold text-[10px]">1</span>
+                        <span>1. AI 인터뷰</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-indigo-400 text-[10px]"></i>
+                    <div id="step2-badge" class="flex items-center space-x-1 text-indigo-300">
+                        <span class="w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]">2</span>
+                        <span>2. 초고 합치기</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-indigo-400 text-[10px]"></i>
+                    <div id="step3-badge" class="flex items-center space-x-1 text-indigo-300">
+                        <span class="w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]">3</span>
+                        <span>3. AI 피드백 & 학습지 19쪽 작성</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -300,6 +315,42 @@
         </section>
     </main>
 
+    <!-- Modal for API Key Settings -->
+    <div id="api-key-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-base font-bold text-slate-800 flex items-center">
+                    <i class="fa-solid fa-key text-amber-500 mr-2"></i> Gemini API 키 설정
+                </h3>
+                <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-600 leading-relaxed">
+                나눔이 AI 챗봇을 작동하려면 **Google Gemini API Key**가 필요합니다.<br>
+                입력하신 키는 웹브라우저(내 기기)에만 안전하게 저장됩니다.
+            </p>
+
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-700">Gemini API Key</label>
+                <input type="password" id="api-key-input" placeholder="AIzaSy..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+            </div>
+
+            <div class="p-3 bg-indigo-50 rounded-xl text-[11px] text-indigo-800 leading-relaxed">
+                <strong class="font-bold">🔑 API 키 발급 방법 (무료):</strong><br>
+                1. <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-600 underline font-bold hover:text-indigo-800">Google AI Studio</a>에 접속합니다.<br>
+                2. 로그인 후 <strong>"Get API key"</strong> -> <strong>"Create API key"</strong> 클릭<br>
+                3. 생성된 <code>AIzaSy...</code> 키를 복사하여 위에 붙여넣고 저장하세요.
+            </div>
+
+            <div class="flex gap-2 justify-end pt-2">
+                <button onclick="closeApiKeyModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition">취소</button>
+                <button onclick="saveApiKey()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-sm">저장 및 사용하기</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal for Proofreading Student's Draft -->
     <div id="proofread-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl p-5 max-w-lg w-full shadow-xl space-y-3">
@@ -317,7 +368,7 @@
                 AI 점검을 마친 최종 수정본은 <strong class="text-indigo-600">교과서가 아닌 [학습지 19쪽]</strong>에 적어 완성합니다!
             </p>
 
-            <textarea id="modal-draft-input" rows="5" placeholder="예시: I want to give away my sneakers. I bought them online last year. They are size 240 and white. I think that my friend Minho needs them." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white resize-none"></textarea>
+            <textarea id="modal-draft-input" rows="5" placeholder="합친 글을 이곳에 작성해 주세요..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white resize-none"></textarea>
 
             <div class="flex gap-2 justify-end pt-1">
                 <button onclick="closeProofreadModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition">취소</button>
@@ -337,9 +388,119 @@
         </div>
     </div>
 
+    <!-- Firebase Integration Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration using user credentials
+        const firebaseConfig = {
+            apiKey: "AIzaSyBr9qMshCYB_Qm15OUiVsLoJkxIkJ2hgNA",
+            authDomain: "seat261006.firebaseapp.com",
+            projectId: "seat261006",
+            storageBucket: "seat261006.firebasestorage.app",
+            messagingSenderId: "397864459268",
+            appId: "1:397864459268:web:634270bf0726d5437c2951"
+        };
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'seat261006';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.firebaseDb = db;
+        window.firebaseAuth = auth;
+        window.firebaseAppId = appId;
+
+        // Auth initialization
+        const initFirebase = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.warn("Firebase Auth falling back to anonymous:", err);
+                try { await signInAnonymously(auth); } catch (e) { console.error(e); }
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            const cloudBadge = document.getElementById('cloud-status-badge');
+            const cloudText = document.getElementById('cloud-status-text');
+            if (user && cloudBadge && cloudText) {
+                cloudBadge.classList.remove('hidden');
+                cloudText.innerText = '클라우드 연동됨';
+                window.loadCloudWork();
+            }
+        });
+
+        // Save progress to private user collection
+        window.saveCloudWork = async function(isSubmission = false) {
+            if (!auth.currentUser) return;
+            const userId = auth.currentUser.uid;
+            const cloudText = document.getElementById('cloud-status-text');
+            if (cloudText) cloudText.innerText = '저장 중...';
+
+            const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'progress', 'current_work');
+            
+            const mindmapDOM = window.getMindmapDOMValues ? window.getMindmapDOMValues() : {};
+            const payload = {
+                mode: window.currentMode,
+                filledCount: window.filledCount,
+                chatHistory: window.chatHistory || [],
+                mindmapData: mindmapDOM,
+                draftInput: document.getElementById('modal-draft-input')?.value || '',
+                updatedAt: new Date().toISOString()
+            };
+
+            try {
+                await setDoc(userDocRef, payload, { merge: true });
+                if (cloudText) cloudText.innerText = '클라우드 저장됨 ☁️';
+
+                if (isSubmission) {
+                    const pubColRef = collection(db, 'artifacts', appId, 'public', 'data', 'submissions');
+                    await addDoc(pubColRef, {
+                        userId: userId,
+                        mode: window.currentMode,
+                        mindmapData: mindmapDOM,
+                        finalDraft: document.getElementById('modal-draft-input')?.value || '',
+                        submittedAt: new Date().toISOString()
+                    });
+                }
+            } catch (e) {
+                console.error("Firestore Save Error:", e);
+                if (cloudText) cloudText.innerText = '저장 실패';
+            }
+        };
+
+        // Load progress from private user collection
+        window.loadCloudWork = async function() {
+            if (!auth.currentUser) return;
+            const userId = auth.currentUser.uid;
+            const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'progress', 'current_work');
+
+            try {
+                const snap = await getDoc(userDocRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data.mode && (!window.chatHistory || window.chatHistory.length === 0)) {
+                        window.restoreFromCloudData(data);
+                    }
+                }
+            } catch (e) {
+                console.error("Firestore Load Error:", e);
+            }
+        };
+
+        initFirebase();
+    </script>
+
     <script>
-        const apiKey = "";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        const DEFAULT_EMBEDDED_API_KEY = "AIzaSyBr9qMshCYB_Qm15OUiVsLoJkxIkJ2hgNA";
 
         const SYSTEM_INSTRUCTION = `
 You are "나눔이" (Giveaway Bot), a warm, supportive middle school English writing chatbot for Korean 7th-grade students studying Dong-A Yoon Lesson 6 ("Think and Write" - Free Giveaway Announcement, textbook p.104).
@@ -382,6 +543,53 @@ CRITICAL PEDAGOGICAL RULES:
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
 
+        // Initialize API Key on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkApiKeyStatus();
+        });
+
+        function getStoredApiKey() {
+            return localStorage.getItem('gemini_api_key') || DEFAULT_EMBEDDED_API_KEY;
+        }
+
+        function checkApiKeyStatus() {
+            const apiKey = getStoredApiKey();
+            const btnText = document.getElementById('api-status-text');
+            const btn = document.getElementById('api-key-status-btn');
+
+            if (apiKey) {
+                btnText.innerText = 'API 키 연결됨';
+                btn.className = 'flex items-center space-x-1.5 bg-emerald-500 hover:bg-emerald-400 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm';
+            } else {
+                btnText.innerText = 'API 키 설정 필요';
+                btn.className = 'flex items-center space-x-1.5 bg-amber-400 hover:bg-amber-300 text-indigo-950 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm animate-pulse';
+            }
+        }
+
+        function openApiKeyModal() {
+            const apiKey = getStoredApiKey();
+            if (apiKey) {
+                document.getElementById('api-key-input').value = apiKey;
+            }
+            document.getElementById('api-key-modal').classList.remove('hidden');
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('api-key-modal').classList.add('hidden');
+        }
+
+        function saveApiKey() {
+            const inputVal = document.getElementById('api-key-input').value.trim();
+            if (!inputVal) {
+                showAlertModal('API 키를 입력해 주세요!');
+                return;
+            }
+            localStorage.setItem('gemini_api_key', inputVal);
+            checkApiKeyStatus();
+            closeApiKeyModal();
+            showAlertModal('API 키가 성공적으로 저장되었습니다!');
+        }
+
         function showAlertModal(msg) {
             document.getElementById('alert-message').innerText = msg;
             document.getElementById('alert-modal').classList.remove('hidden');
@@ -392,7 +600,6 @@ CRITICAL PEDAGOGICAL RULES:
         }
 
         function formatAiResponse(text) {
-            // Replace markdown bold, linebreaks, bullet points
             let formatted = text
                 .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-indigo-900">$1</strong>')
                 .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
@@ -439,6 +646,14 @@ CRITICAL PEDAGOGICAL RULES:
         }
 
         async function queryGeminiAPI(userQueryText) {
+            const apiKey = getStoredApiKey();
+            if (!apiKey) {
+                removeThinkingIndicator();
+                openApiKeyModal();
+                showAlertModal("챗봇 대화를 시작하려면 먼저 우측 상단 [API 키 설정]에 Gemini API 키를 입력해 주세요!");
+                return;
+            }
+
             if (isProcessing) return;
             isProcessing = true;
 
@@ -456,31 +671,36 @@ CRITICAL PEDAGOGICAL RULES:
                 }
             };
 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
             let response = null;
-            let retries = 0;
-            const maxRetries = 3;
+            let errorMessage = "미안해, 일시적인 오류가 발생했어. 다시 한 번 말씀해 줄래?";
 
-            while (retries < maxRetries) {
-                try {
-                    response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+            try {
+                response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-                    if (response.ok) break;
-                } catch (e) {
-                    console.debug("Retry API call:", retries);
+                if (!response.ok) {
+                    if (response.status === 400 || response.status === 403) {
+                        errorMessage = "⚠️ API 키가 유효하지 않습니다. 우측 상단의 [🔑 API 키 설정] 버튼을 눌러 정확한 Gemini API 키를 입력해 주세요.";
+                    } else if (response.status === 429) {
+                        errorMessage = "⚠️ API 연동 요청 한도가 초과되었습니다. 잠시 후 다시 시도해 주세요.";
+                    }
                 }
-                retries++;
-                await new Promise(r => setTimeout(r, Math.pow(2, retries) * 1000));
+            } catch (e) {
+                console.error("Fetch Error:", e);
+                errorMessage = "네트워크 연결 또는 API 연동 중 오류가 발생했습니다.";
             }
 
             removeThinkingIndicator();
             isProcessing = false;
 
             if (!response || !response.ok) {
-                appendAiMessage("미안해, 일시적인 오류가 발생했어. 다시 한 번 말씀해 줄래?");
+                chatHistory.pop();
+                appendAiMessage(errorMessage);
                 return;
             }
 
@@ -493,59 +713,122 @@ CRITICAL PEDAGOGICAL RULES:
                     role: 'model',
                     parts: [{ text: aiReplyText }]
                 });
-                appendAiMessage(aiReplyText);
+
+                // Check for MINDMAP_UPDATE XML tag
+                let displayContent = aiReplyText;
+                const tagMatch = aiReplyText.match(/<MINDMAP_UPDATE>([\s\S]*?)<\/MINDMAP_UPDATE>/);
+                if (tagMatch) {
+                    const tagBody = tagMatch[1];
+                    const keyMatch = tagBody.match(/key:\s*(\w+)/);
+                    const valMatch = tagBody.match(/value:\s*(.+)/);
+                    if (keyMatch && valMatch) {
+                        updateMindmapUI(keyMatch[1].trim(), valMatch[1].trim());
+                    }
+                    displayContent = displayContent.replace(/<MINDMAP_UPDATE>[\s\S]*?<\/MINDMAP_UPDATE>/g, '').trim();
+                }
+
+                if (aiReplyText.includes('<INTERVIEW_COMPLETE/>')) {
+                    displayContent = displayContent.replace('<INTERVIEW_COMPLETE/>', '').trim();
+                    unlockDraftCombinationStep();
+                }
+
+                appendAiMessage(displayContent);
             } else {
-                appendAiMessage("답변을 생성하지 못했어. 다시 시도해 볼까?");
+                appendAiMessage("답변을 생성하지 못했습니다. 다시 시도해 주세요.");
             }
         }
 
         function appendAiMessage(text) {
-            const { cleanText, mindmapData, isComplete } = parseMindmapUpdates(text);
-            
-            if (mindmapData) {
-                updateMindmapUI(mindmapData.key, mindmapData.value);
-            }
-
-            if (isComplete || filledCount >= 5) {
-                unlockDraftCombinationStep();
-            }
-
             const msgDiv = document.createElement('div');
             msgDiv.className = 'flex items-start space-x-3';
             msgDiv.innerHTML = `
                 <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
                     <i class="fa-solid fa-robot"></i>
                 </div>
-                <div class="bg-white border border-indigo-100 rounded-2xl rounded-tl-none p-3.5 shadow-sm max-w-[85%] text-sm text-slate-700 leading-relaxed">
-                    ${formatAiResponse(cleanText)}
+                <div class="bg-white border border-indigo-100 rounded-2xl rounded-tl-none p-4 shadow-sm max-w-[90%] text-sm text-slate-700 leading-relaxed">
+                    ${formatAiResponse(text)}
                 </div>
             `;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function parseMindmapUpdates(text) {
-            const regex = /<MINDMAP_UPDATE>[\s\S]*?key:\s*(\w+)[\s\S]*?value:\s*([\s\S]*?)<\/MINDMAP_UPDATE>/i;
-            const match = text.match(regex);
-            const isComplete = text.includes('<INTERVIEW_COMPLETE/>');
-            
-            let mindmapData = null;
+        function unlockDraftCombinationStep() {
+            document.getElementById('interview-progress-status').classList.add('hidden');
+            document.getElementById('draft-ready-box').classList.remove('hidden');
 
-            if (match) {
-                mindmapData = {
-                    key: match[1].toLowerCase().trim(),
-                    value: match[2].trim()
-                };
+            // Update Progress Step Badges
+            document.getElementById('step1-badge').className = 'flex items-center space-x-1 text-indigo-300';
+            document.getElementById('step1-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]';
+
+            document.getElementById('step2-badge').className = 'flex items-center space-x-1 text-yellow-300 font-bold';
+            document.getElementById('step2-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-yellow-400 text-indigo-900 flex items-center justify-center font-extrabold text-[10px]';
+        }
+
+        function getMindmapDOMValues() {
+            return {
+                stdWhat: document.getElementById('std-map-what')?.textContent || '',
+                stdWhenwhere: document.getElementById('std-map-whenwhere')?.textContent || '',
+                stdSizecolor: document.getElementById('std-map-sizecolor')?.textContent || '',
+                stdWhy: document.getElementById('std-map-why')?.textContent || '',
+                stdInference: document.getElementById('std-map-inference')?.textContent || '',
+                expWhat: document.getElementById('exp-map-what')?.textContent || '',
+                expHowwhere: document.getElementById('exp-map-howwhere')?.textContent || '',
+                expFeature: document.getElementById('exp-map-feature')?.textContent || '',
+                expWhy: document.getElementById('exp-map-why')?.textContent || '',
+                expInference: document.getElementById('exp-map-inference')?.textContent || ''
+            };
+        }
+
+        function restoreFromCloudData(data) {
+            if (!data || !data.mode) return;
+            
+            currentMode = data.mode;
+            filledCount = data.filledCount || 0;
+            chatHistory = data.chatHistory || [];
+
+            // UI Mode Switch
+            document.getElementById('mindmap-placeholder').classList.add('hidden');
+            document.getElementById('user-input').disabled = false;
+            document.getElementById('send-btn').disabled = false;
+            document.getElementById('user-input').placeholder = "답변을 적어봐 (한글이나 짧은 단어도 괜찮아!)...";
+
+            const modeBadge = document.getElementById('mode-badge');
+            if (currentMode === 'standard') {
+                document.getElementById('standard-mindmap').classList.remove('hidden');
+                document.getElementById('expanded-mindmap').classList.add('hidden');
+                modeBadge.textContent = '👟 기본 글쓰기 (물건)';
+                modeBadge.className = 'text-[11px] bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-full';
+            } else {
+                document.getElementById('standard-mindmap').classList.add('hidden');
+                document.getElementById('expanded-mindmap').classList.remove('hidden');
+                modeBadge.textContent = '✨ 확장 글쓰기 (재능/특별나눔)';
+                modeBadge.className = 'text-[11px] bg-purple-100 text-purple-700 font-semibold px-2.5 py-1 rounded-full';
             }
 
-            let cleanText = text
-                .replace(/<MINDMAP_UPDATE>[\s\S]*?<\/MINDMAP_UPDATE>/gi, '')
-                .replace(/<INTERVIEW_COMPLETE\/>/gi, '')
-                .replace(/key:\s*\w+/gi, '')
-                .replace(/value:\s*.*$/gim, '')
-                .trim();
+            // Restore Mindmap Values
+            if (data.mindmapData) {
+                const m = data.mindmapData;
+                if (m.stdWhat) document.getElementById('std-map-what').textContent = m.stdWhat;
+                if (m.stdWhenwhere) document.getElementById('std-map-whenwhere').textContent = m.stdWhenwhere;
+                if (m.stdSizecolor) document.getElementById('std-map-sizecolor').textContent = m.stdSizecolor;
+                if (m.stdWhy) document.getElementById('std-map-why').textContent = m.stdWhy;
+                if (m.stdInference) document.getElementById('std-map-inference').textContent = m.stdInference;
 
-            return { cleanText, mindmapData, isComplete };
+                if (m.expWhat) document.getElementById('exp-map-what').textContent = m.expWhat;
+                if (m.expHowwhere) document.getElementById('exp-map-howwhere').textContent = m.expHowwhere;
+                if (m.expFeature) document.getElementById('exp-map-feature').textContent = m.expFeature;
+                if (m.expWhy) document.getElementById('exp-map-why').textContent = m.expWhy;
+                if (m.expInference) document.getElementById('exp-map-inference').textContent = m.expInference;
+            }
+
+            if (data.draftInput) {
+                document.getElementById('modal-draft-input').value = data.draftInput;
+            }
+
+            if (filledCount >= 4) {
+                unlockDraftCombinationStep();
+            }
         }
 
         function updateMindmapUI(key, value) {
@@ -574,6 +857,9 @@ CRITICAL PEDAGOGICAL RULES:
                     el.parentElement.classList.add('mindmap-updated');
                     setTimeout(() => el.parentElement.classList.remove('mindmap-updated'), 1200);
                     filledCount++;
+                    
+                    if (window.saveCloudWork) window.saveCloudWork(false);
+
                     if (filledCount >= 4) {
                         unlockDraftCombinationStep();
                     }
@@ -581,22 +867,16 @@ CRITICAL PEDAGOGICAL RULES:
             }
         }
 
-        function unlockDraftCombinationStep() {
-            document.getElementById('interview-progress-status').classList.add('hidden');
-            document.getElementById('draft-ready-box').classList.remove('hidden');
-            
-            // Update Top Progress Badges
-            document.getElementById('step1-badge').className = 'flex items-center space-x-1 text-indigo-300';
-            document.getElementById('step1-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]';
-
-            document.getElementById('step2-badge').className = 'flex items-center space-x-1 text-yellow-300 font-bold';
-            document.getElementById('step2-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-yellow-400 text-indigo-900 flex items-center justify-center font-extrabold text-[10px]';
-        }
-
         async function selectWritingMode(mode) {
+            const apiKey = getStoredApiKey();
+            if (!apiKey) {
+                openApiKeyModal();
+                showAlertModal("글쓰기 모드를 선택하기 전에 우측 상단 [🔑 API 키 설정] 버튼을 눌러 Gemini API 키를 입력해 주세요!");
+                return;
+            }
+
             currentMode = mode;
             
-            // Enable Input Form
             userInput.disabled = false;
             sendBtn.disabled = false;
             userInput.placeholder = "답변을 적어봐 (한글이나 짧은 단어도 괜찮아!)...";
@@ -662,7 +942,8 @@ CRITICAL PEDAGOGICAL RULES:
 
             closeProofreadModal();
 
-            // Update Progress Badge to Step 3
+            if (window.saveCloudWork) window.saveCloudWork(true);
+
             document.getElementById('step2-badge').className = 'flex items-center space-x-1 text-indigo-300';
             document.getElementById('step2-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]';
 
@@ -743,7 +1024,6 @@ ${draft}
             document.getElementById('step3-badge').className = 'flex items-center space-x-1 text-indigo-300';
             document.getElementById('step3-badge').querySelector('span').className = 'w-5 h-5 rounded-full bg-indigo-800 text-indigo-200 flex items-center justify-center font-bold text-[10px]';
 
-            // Reset mindmap cell values
             ['std-map-what', 'std-map-whenwhere', 'std-map-sizecolor', 'std-map-why', 'std-map-inference',
              'exp-map-what', 'exp-map-howwhere', 'exp-map-feature', 'exp-map-why', 'exp-map-inference'].forEach(id => {
                 const el = document.getElementById(id);
