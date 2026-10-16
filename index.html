@@ -32,8 +32,8 @@
                 <span id="cloudStatus" class="bg-indigo-700 text-indigo-100 px-3 py-1 rounded-full flex items-center gap-1">
                     <i class="fa-solid fa-cloud text-xs"></i> 로컬 모드
                 </span>
-                <button onclick="openApiKeyModal()" id="apiBadge" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-full font-medium transition flex items-center gap-1 shadow-sm">
-                    <i class="fa-solid fa-key text-xs"></i> <span id="apiBadgeText">API 키 연결됨</span>
+                <button onclick="openApiKeyModal()" id="apiBadge" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-full font-medium transition flex items-center gap-1 shadow-sm">
+                    <i class="fa-solid fa-key text-xs"></i> <span id="apiBadgeText">API 키 설정 필요</span>
                 </button>
             </div>
         </div>
@@ -163,7 +163,7 @@
                 </div>
             </div>
 
-            <!-- Core Grammar Structure Box -->
+            <!-- Core Grammar Scaffold Box -->
             <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs space-y-2">
                 <h4 class="font-bold text-amber-900 flex items-center gap-1.5 text-sm">
                     <i class="fa-solid fa-key text-amber-600"></i> 6단원 핵심 문법 구조 뼈대
@@ -195,17 +195,14 @@
             </div>
             
             <p class="text-xs text-slate-600 leading-relaxed">
-                기본 제공 API 키가 내장되어 있습니다. 변경이 필요한 경우에만 입력해 주세요.
+                Gemini API 키를 입력해 주세요. (URL 링크 접속 시 자동으로 설정됩니다.)
             </p>
 
-            <input type="password" id="apiKeyInput" placeholder="새로운 API 키 입력..." class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+            <input type="password" id="apiKeyInput" placeholder="API 키 입력..." class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
 
-            <div class="flex justify-between items-center pt-2">
-                <button onclick="resetToDefaultKey()" class="text-xs text-rose-600 hover:underline">기본 내장키로 초기화</button>
-                <div class="flex gap-2">
-                    <button onclick="closeApiKeyModal()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-200">취소</button>
-                    <button onclick="saveApiKey()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700">저장</button>
-                </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeApiKeyModal()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-200">취소</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700">저장 및 사용</button>
             </div>
         </div>
     </div>
@@ -251,11 +248,7 @@
 
     <!-- Application Script Logic -->
     <script>
-        // 기본 내장 API 키 (Base64 인코딩)
-        const DEFAULT_EMBEDDED_KEY = atob('QVEuQWI4Uk42SzFfMDVpbnRhRGxlM2dJWGdDQVhBaERVeDFjNlVOTDlOU01jTW9zeEJ0R2c=');
-        
-        let userApiKey = localStorage.getItem('gemini_api_key') || DEFAULT_EMBEDDED_KEY;
-        let isRetryingWithDefault = false;
+        let userApiKey = localStorage.getItem('gemini_api_key') || '';
         let currentMode = null;
         let chatHistory = [];
         let mindmapData = { what: '', feature: '', whenwhere: '', why: '', who: '' };
@@ -277,11 +270,13 @@ CRITICAL PEDAGOGICAL GUIDELINES:
 `;
 
         window.onload = function() {
+            // URL 파라미터(?k=키)가 들어오면 자동으로 저장
             const urlParams = new URLSearchParams(window.location.search);
             const keyFromUrl = urlParams.get('k') || urlParams.get('key');
             if (keyFromUrl) {
                 userApiKey = keyFromUrl.trim();
                 localStorage.setItem('gemini_api_key', userApiKey);
+                // 주소창 깔끔하게 정리 (?k=... 숨김)
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
             updateApiBadge();
@@ -290,12 +285,17 @@ CRITICAL PEDAGOGICAL GUIDELINES:
         function updateApiBadge() {
             const badge = document.getElementById('apiBadge');
             const badgeText = document.getElementById('apiBadgeText');
-            badge.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-full font-medium transition flex items-center gap-1 shadow-sm";
-            badgeText.innerText = "API 키 연결됨";
+            if (userApiKey && userApiKey.trim() !== '') {
+                badge.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-full font-medium transition flex items-center gap-1 shadow-sm";
+                badgeText.innerText = "API 키 연결됨";
+            } else {
+                badge.className = "bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-full font-medium transition flex items-center gap-1 shadow-sm";
+                badgeText.innerText = "API 키 설정 필요";
+            }
         }
 
         function openApiKeyModal() {
-            document.getElementById('apiKeyInput').value = userApiKey === DEFAULT_EMBEDDED_KEY ? '' : userApiKey;
+            document.getElementById('apiKeyInput').value = userApiKey;
             document.getElementById('apiKeyModal').classList.remove('hidden');
         }
 
@@ -305,21 +305,15 @@ CRITICAL PEDAGOGICAL GUIDELINES:
 
         function saveApiKey() {
             const inputVal = document.getElementById('apiKeyInput').value.trim();
-            if(inputVal) {
-                userApiKey = inputVal;
-                localStorage.setItem('gemini_api_key', userApiKey);
-            } else {
-                resetToDefaultKey();
+            if(!inputVal) {
+                alert("유효한 API 키를 입력해 주세요.");
+                return;
             }
+            userApiKey = inputVal;
+            localStorage.setItem('gemini_api_key', userApiKey);
             updateApiBadge();
             closeApiKeyModal();
-        }
-
-        function resetToDefaultKey() {
-            localStorage.removeItem('gemini_api_key');
-            userApiKey = DEFAULT_EMBEDDED_KEY;
-            updateApiBadge();
-            closeApiKeyModal();
+            appendBotMessage("API 키가 성공적으로 등록되었어! 대화를 계속 이어가보자.");
         }
 
         function selectMode(mode) {
@@ -355,6 +349,11 @@ CRITICAL PEDAGOGICAL GUIDELINES:
         }
 
         async function callGeminiAPI(userText) {
+            if(!userApiKey) {
+                appendBotMessage("⚠️ API 키가 설정되지 않았어. 우측 상단의 [🔑 API 키 설정]을 눌러 키를 입력해 줘!");
+                return;
+            }
+
             chatHistory.push({ role: "user", parts: [{ text: userText }] });
 
             const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`;
@@ -372,20 +371,11 @@ CRITICAL PEDAGOGICAL GUIDELINES:
 
                 const data = await response.json();
 
-                // 오류 발생 시 저장된 옛날 키 삭제 후 내장 키로 즉시 재시도
                 if(data.error) {
-                    if (localStorage.getItem('gemini_api_key') && !isRetryingWithDefault) {
-                        isRetryingWithDefault = true;
-                        localStorage.removeItem('gemini_api_key');
-                        userApiKey = DEFAULT_EMBEDDED_KEY;
-                        chatHistory.pop(); // 중복 메시지 방지
-                        return await callGeminiAPI(userText);
-                    }
-                    appendBotMessage("⚠️ API 통신 오류가 발생했습니다. 잠시 후 다시 전송해 주세요.");
+                    appendBotMessage("⚠️ API 키가 올바르지 않거나 구글 서버 오류입니다. API 키를 다시 확인해 주세요.");
                     return;
                 }
 
-                isRetryingWithDefault = false;
                 const botReply = data.candidates[0].content.parts[0].text;
                 chatHistory.push({ role: "model", parts: [{ text: botReply }] });
 
